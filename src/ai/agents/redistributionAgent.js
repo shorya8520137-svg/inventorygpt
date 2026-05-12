@@ -26,10 +26,19 @@ async function analyzeRedistribution(contextData) {
     try {
         const messages = [
             new SystemMessage(systemPrompt),
-            new HumanMessage(`Analyze the following operational data and provide redistribution recommendations based on your core responsibilities:
+            new HumanMessage(`Analyze the following operational data and provide redistribution recommendations based on your core responsibilities.
             
             Operational Context:
             ${JSON.stringify(contextData, null, 2)}
+            
+            Analyze the context data and return EXACTLY the following format. Do not add conversational fluff.
+
+            Transfer Recommendation: [Actionable Sentence]
+            Transfer Confidence Score: [0-100]%
+            Expected Outcomes:
+            - [X]% lower stockout risk
+            - [Y]% faster fulfillment
+            - [Z]% lower holding cost
             `)
         ];
 
