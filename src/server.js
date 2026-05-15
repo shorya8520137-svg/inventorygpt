@@ -12,6 +12,7 @@ const { createTask, updateTaskStatus } = require('./core/transferLifecycleEngine
 const { allocatePlannedStock, verifyPhysicalReceipt } = require('./core/inventoryStateEngine');
 const { initEventOrchestrator, publishEvent } = require('./core/eventOrchestrator');
 const { initiateTransferWorkflow } = require('./core/transferWorkflowOrchestrator');
+const { attachDataFeedToContext } = require('./services/inventoryGptDataFeed');
 require('dotenv').config();
 
 const app = express();
@@ -150,6 +151,10 @@ app.post('/api/ai/analyze-redistribution', async (req, res) => {
             }
         }
 
+        if (!(req.body && req.body.contextData)) {
+            await attachDataFeedToContext(contextData);
+        }
+
         const recommendation = await analyzeRedistribution(contextData);
         
         // 4. Save to ai_inventory_recommendations
@@ -222,6 +227,10 @@ app.post('/api/ai/analyze-deadstock', async (req, res) => {
             }
         }
 
+        if (!(req.body && req.body.contextData)) {
+            await attachDataFeedToContext(contextData);
+        }
+
         const recommendation = await analyzeDeadStock(contextData);
         
         const metrics = await processAutonomousThresholds(pool, recommendation, 'DEAD_STOCK');
@@ -290,6 +299,10 @@ app.post('/api/ai/analyze-marketplace', async (req, res) => {
             }
         }
 
+        if (!(req.body && req.body.contextData)) {
+            await attachDataFeedToContext(contextData);
+        }
+
         const recommendation = await analyzeMarketplace(contextData);
         
         const metrics = await processAutonomousThresholds(pool, recommendation, 'MARKETPLACE');
@@ -356,6 +369,10 @@ app.post('/api/ai/analyze-warehouse-risk', async (req, res) => {
                     historical_memory: "WH-EAST-1 courier partners often face logistical delays due to seasonal monsoons."
                 };
             }
+        }
+
+        if (!(req.body && req.body.contextData)) {
+            await attachDataFeedToContext(contextData);
         }
 
         const recommendation = await analyzeWarehouseRisk(contextData);
@@ -548,6 +565,10 @@ app.post('/api/ai/predictive-scan', async (req, res) => {
                     historical_memory: "Demand spikes 300% starting next week."
                 };
             }
+        }
+
+        if (!(req.body && req.body.contextData)) {
+            await attachDataFeedToContext(contextData);
         }
 
         const recommendation = await analyzePredictive(contextData);
